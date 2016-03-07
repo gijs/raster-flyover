@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.15.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.15.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZ2lqcyIsImEiOiJqbWhTeU40In0.MM99yhbo2Jwi9BfAsGqZ4A';
+
+var locations = [{
+    "id": "2",
+    "title": "Purmerend",
+    "description": "",
+    "camera": {
+        center: [4.9521, 52.4543],
+        zoom: 12,
+        pitch: 50
+    }
+}, {
+    "id": "3",
+    "title": "Heemstede",
+    "description": "",
+    "camera": {
+        center: [4.6239, 52.3462],
+        bearing: -8.9,
+        zoom: 15.68
+    }
+},
+{
+    "id": "4",
+    "title": "Utrecht",
+    "description": "",
+    "camera": {
+        center: [5.1149,52.0966],
+        bearing: 36,
+        zoom: 11.37
+    }
+}, {
+    "id": "5",
+    "title": "Eindhoven",
+    "description": "",
+    "camera": {
+        center: [5.4634, 51.4362],
+        bearing: 28.4,
+        zoom: 11.64
+    }
+}, {
+    "title": "Rotterdam",
+    "description": "",
+    "camera": {
+        center: [4.4664, 51.9126],
+        zoom: 9.68,
+        bearing: 0,
+        pitch: 0
+    }
+}];
+
+function playback(index) {
+    
+    // Animate the map position based on camera properties
+    map.flyTo(locations[index].camera);
+
+    map.once('moveend', function() {
+        // Duration the slide is on screen after interaction
+        window.setTimeout(function() {
+            // Increment index
+            index = (index + 1 === locations.length) ? 0 : index + 1;
+            playback(index);
+        }, 4000); // After callback, show the location for 4 seconds.
+    });
+}
+
+var map = new mapboxgl.Map({
+    container: 'map',
+    center: [5.5745, 52.0732],
+    pitch: 60, // pitch in degrees
+    bearing: -60, // bearing in degrees
+    style: 'mapbox://styles/mapbox/streets-v8',
+    zoom: 10
+});
+
+map.addControl(new mapboxgl.Navigation());
+
+map.on('style.load', function () {
+    map.addSource('lizard', {
+        "type": "raster",
+        "tiles": [
+            // "https://raster.staging.lizard.net/tms/raster/demo:cover/lc-fun/{z}/{x}/{y}"
+            "https://raster.staging.lizard.net/tms/raster/dem:nl/dem-nl/{z}/{x}/{y}"
+            // "https://raster.staging.lizard.net/tms/raster/intern:nl:hhnk:drooglegging/dem-nl/{z}/{x}/{y}"
+        ],
+        "tileSize": 256
+    });
+
+    map.addLayer({
+        "id": "lizard",
+        "type": "raster",
+        "source": "lizard",
+        "source-layer": "lizard"
+    }, 'water');    
+
+     playback(0);
+});
+
+
+
+
+</script>
+
+</body>
+</html>
+
